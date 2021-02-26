@@ -6,11 +6,10 @@ char arr[3][3];
 void arrayInit(){
     for(int i=0; i<3; i++){
         for(int j=0; j<3; j++){
-            if(i==2){
+            if(i==2)
                 arr[i][j] = ' ';
-                return;
-            }
-            arr[i][j] = '_';
+            else
+                arr[i][j] = '_';
         }
     }
 }
