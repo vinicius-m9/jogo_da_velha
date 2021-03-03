@@ -3,9 +3,10 @@
 	<stdio.h>
 	<stdlib.h>
 
-1614795812 source:c:\users\casa\desktop\jogo_da_velha\main.c
+1614802034 source:c:\users\casa\desktop\jogo_da_velha\main.c
 	<stdio.h>
 	<stdlib.h>
 	<ctype.h>
 	<stdbool.h>
+	<time.h>
 

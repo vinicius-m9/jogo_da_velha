@@ -1,11 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// biblioteca para utilizar a funcao toupper()
+/**
+* biblioteca para utilizar a funcao toupper()
+*/
 #include <ctype.h>
 
-// biblioteca para utilizar dados booleanos
+/**
+* biblioteca para utilizar dados booleanos
+*/
 #include <stdbool.h>
+
+/**
+* biblioteca para utilizar a funcao time()
+*/
+#include <time.h>
 
 char arr[3][3];
 char player1[51], player2[51];
@@ -22,20 +31,6 @@ void arrayInit(void){
     }
 }
 
-int charToInt (char line){
-    switch(toupper(line)){
-        case 'A':
-            return 0;
-        case 'B':
-            return 1;
-        case 'C':
-            return 2;
-        default:
-            break;
-    }
-    return -1;
-}
-
 int validSymbol(char symbol){
     symbol = toupper(symbol);
 
@@ -45,19 +40,15 @@ int validSymbol(char symbol){
     return 0;
 }
 
-int validCoord(char line, int column){
-    int i = charToInt(line), j = column-1;
-
-    if(i>=0 && i<3 && j>=0 && j<3)
+int validCoord(int line, int column){
+    if(line>=0 && line<3 && column>=0 && column<3)
         return 1;
 
     return 0;
 }
 
-int coordEmpty(char line, int column){
-    int i = charToInt(line), j = column-1;
-
-    if(!validSymbol(arr[i][j]))
+int coordEmpty(int line, int column){
+    if(!validSymbol(arr[line][column]))
         return 1;
 
     return 0;
@@ -98,7 +89,9 @@ int columnWin(void){
 int diagonalWin(void){
     int count = 0;
 
-    // main diagonal
+    /**
+    * main diagonal
+    */
     for(int i=0; i<2; i++){
         if(validSymbol(arr[i][i]) && arr[i][i] == arr[i+1][i+1])
             count++;
@@ -108,7 +101,9 @@ int diagonalWin(void){
 
     count = 0;
 
-    // secondary diagonal
+    /**
+    * secondary diagonal
+    */
     for(int i=0; i<2; i++){
         if(validSymbol(arr[i][i]) && arr[i][2-i] == arr[i+1][1-i])
             count++;
@@ -145,35 +140,51 @@ void printArray(void){
     printf("\n");
 }
 
-void changeArray(char symbol, char line, int column){
-    int i = charToInt(line), j = column-1;
-
-    arr[i][j] = toupper(symbol);
-}
-
 void playerMove(char player[51], char symbol){
-    int column;
-    char line;
+    int j, line, column;
+    char i;
 
     printf("Vez de %s. Indique linha e coluna para jogar\n", player);
 
     printf("linha:\n");
-    scanf(" %c", &line);
+    scanf(" %c", &i);
+    line = toupper(i) - 65;
 
     printf("coluna:\n");
-    scanf("%i", &column);
+    scanf("%i", &j);
+    column = j - 1;
 
     while(!validCoord(line, column) || !coordEmpty(line, column)){
         printf("Coordenada invalida. Digite novamente!\n");
 
         printf("linha:\n");
-        scanf(" %c", &line);
+        scanf(" %c", &i);
+        line = toupper(i) - 65;
 
         printf("coluna:\n");
-        scanf("%i", &column);
+        scanf("%i", &j);
+        column = j - 1;
     }
 
-    changeArray(symbol, line, column);
+    arr[line][column] = toupper(symbol);
+
+    /**
+    * OS variation
+    * system("cls"); -> Windows
+    * system("clear"); -> Linux
+    */
+    system("cls");
+}
+
+void botMove(char symbol){
+    int line = rand() % 3, column = rand() % 3;
+
+    while(!validCoord(line, column) || !coordEmpty(line, column)){
+        line = rand() % 3;
+        column = rand() % 3;
+    }
+
+    arr[line][column] = toupper(symbol);
 
     /**
     * OS variation
@@ -199,15 +210,52 @@ void playerXplayer(void){
 
     printArray();
 
-    // correção para identificar o ganhador
+    /**
+    * correcao para identificar o ganhador
+    */
     turn -= 1;
 
-    if(turn % 2 == 0)
+    if(winner() && turn % 2 == 0){
         printf("%s venceu!", player1);
-    else if(turn % 2 != 0)
+        return;
+    }
+    if(winner() && turn % 2 != 0){
         printf("%s venceu!", player2);
-    else
-        printf("Deu velha!");
+        return;
+    }
+    printf("Deu velha!");
+}
+
+void playerXbot(void){
+    int turn = rand() % 2, stop = turn + 9;
+
+    while(!winner() && turn < stop){
+        printArray();
+
+        if(turn % 2 == 0)
+            playerMove(player1, symbol1);
+        else
+            botMove(symbol2);
+
+        turn++;
+    }
+
+    printArray();
+
+    /**
+    * correcao para identificar o ganhador
+    */
+    turn -= 1;
+
+    if(winner() && turn % 2 == 0){
+        printf("%s venceu!", player1);
+        return;
+    }
+    if(winner() && turn % 2 != 0){
+        printf("Maquina venceu!");
+        return;
+    }
+    printf("Deu velha!");
 }
 
 void menuOption(void){
@@ -256,10 +304,43 @@ void menuOption(void){
         system("cls");
 
         playerXplayer();
+    }else{
+        printf("Digite o nome do jogador (ex.: nome_sobrenome):\n");
+        scanf("%s", player1);
+
+        printf("\nDigite o simbolo que deseja utilizar: X ou O\n");
+        scanf(" %c", &symbol1);
+        printf("\n");
+
+        while(!validSymbol(symbol1)){
+            printf("simbolo invalido! Digite novamente:\n");
+            scanf(" %c", &symbol1);
+            printf("\n");
+        }
+
+        if(toupper(symbol1) == 'X')
+            symbol2 = 'O';
+        else
+            symbol2 = 'X';
+
+        /**
+        * OS variation
+        * system("cls"); -> Windows
+        * system("clear"); -> Linux
+        */
+        system("cls");
+
+        playerXbot();
     }
 }
 
 int main(void){
+    /**
+    * modifica a seed para gerar numeros aleatorios toda vez que o
+    * programa for executado
+    */
+    srand(time(NULL));
+
     arrayInit();
 
     menuOption();
