@@ -16,9 +16,44 @@
 */
 #include <time.h>
 
+/**
+* declaracao de variaveis globais
+*/
 char arr[3][3];
 char player1[51], player2[51];
 char symbol1, symbol2;
+
+/**
+* declaracao de funcoes
+*/
+void arrayInit(void);
+void menuOption(void);
+void printArray(void);
+int validSymbol(char symbol);
+void playerXplayer(void);
+void playerXbot(void);
+void botMove(char symbol);
+void playerMove(char player[51], char symbol);
+int validCoord(int line, int column);
+int coordEmpty(int line, int column);
+int winner(void);
+int lineWin(void);
+int columnWin(void);
+int diagonalWin(void);
+
+int main(void){
+    /**
+    * modifica a seed para gerar numeros aleatorios toda vez que o
+    * programa for executado
+    */
+    srand(time(NULL));
+
+    arrayInit();
+
+    menuOption();
+
+    return 0;
+}
 
 void arrayInit(void){
     for(int i=0; i<3; i++){
@@ -29,233 +64,6 @@ void arrayInit(void){
                 arr[i][j] = '_';
         }
     }
-}
-
-int validSymbol(char symbol){
-    symbol = toupper(symbol);
-
-    if(symbol == 'X' || symbol == 'O')
-        return 1;
-
-    return 0;
-}
-
-int validCoord(int line, int column){
-    if(line>=0 && line<3 && column>=0 && column<3)
-        return 1;
-
-    return 0;
-}
-
-int coordEmpty(int line, int column){
-    if(!validSymbol(arr[line][column]))
-        return 1;
-
-    return 0;
-}
-
-int lineWin(void){
-    int count = 0;
-
-    for(int i=0; i<3; i++){
-        for(int j=0; j<2; j++){
-            if(validSymbol(arr[i][j]) && arr[i][j] == arr[i][j+1])
-                count++;
-        }
-        if(count == 2)
-            return 1;
-
-        count = 0;
-    }
-    return 0;
-}
-
-int columnWin(void){
-    int count = 0;
-
-    for(int j=0; j<3; j++){
-        for(int i=0; i<2; i++){
-            if(validSymbol(arr[i][j]) && arr[i][j] == arr[i+1][j])
-                count++;
-        }
-        if(count == 2)
-            return 1;
-
-        count = 0;
-    }
-    return 0;
-}
-
-int diagonalWin(void){
-    int count = 0;
-
-    /**
-    * main diagonal
-    */
-    for(int i=0; i<2; i++){
-        if(validSymbol(arr[i][i]) && arr[i][i] == arr[i+1][i+1])
-            count++;
-    }
-    if(count == 2)
-        return 1;
-
-    count = 0;
-
-    /**
-    * secondary diagonal
-    */
-    for(int i=0; i<2; i++){
-        if(validSymbol(arr[i][i]) && arr[i][2-i] == arr[i+1][1-i])
-            count++;
-    }
-    if(count == 2)
-        return 1;
-
-    return 0;
-}
-
-int winner(void){
-    if(lineWin() || columnWin() || diagonalWin())
-        return 1;
-
-    return 0;
-}
-
-void printArray(void){
-    int ASCII = 65;
-
-    printf("  1 2 3\n");
-
-    for(int i=0; i<3; i++){
-        printf("%c ", ASCII++);
-
-        for(int j=0; j<3; j++){
-            printf("%c", arr[i][j]);
-
-            if(j!=2)
-                printf("|");
-        }
-        printf("\n");
-    }
-    printf("\n");
-}
-
-void playerMove(char player[51], char symbol){
-    int j, line, column;
-    char i;
-
-    printf("Vez de %s. Indique linha e coluna para jogar\n", player);
-
-    printf("linha:\n");
-    scanf(" %c", &i);
-    line = toupper(i) - 65;
-
-    printf("coluna:\n");
-    scanf("%i", &j);
-    column = j - 1;
-
-    while(!validCoord(line, column) || !coordEmpty(line, column)){
-        printf("Coordenada invalida. Digite novamente!\n");
-
-        printf("linha:\n");
-        scanf(" %c", &i);
-        line = toupper(i) - 65;
-
-        printf("coluna:\n");
-        scanf("%i", &j);
-        column = j - 1;
-    }
-
-    arr[line][column] = toupper(symbol);
-
-    /**
-    * OS variation
-    * system("cls"); -> Windows
-    * system("clear"); -> Linux
-    */
-    system("cls");
-}
-
-void botMove(char symbol){
-    int line = rand() % 3, column = rand() % 3;
-
-    while(!validCoord(line, column) || !coordEmpty(line, column)){
-        line = rand() % 3;
-        column = rand() % 3;
-    }
-
-    arr[line][column] = toupper(symbol);
-
-    /**
-    * OS variation
-    * system("cls"); -> Windows
-    * system("clear"); -> Linux
-    */
-    system("cls");
-}
-
-void playerXplayer(void){
-    int turn = 0;
-
-    while(!winner() && turn < 9){
-        printArray();
-
-        if(turn % 2 == 0)
-            playerMove(player1, symbol1);
-        else
-            playerMove(player2, symbol2);
-
-        turn++;
-    }
-
-    printArray();
-
-    /**
-    * correcao para identificar o ganhador
-    */
-    turn -= 1;
-
-    if(winner() && turn % 2 == 0){
-        printf("%s venceu!", player1);
-        return;
-    }
-    if(winner() && turn % 2 != 0){
-        printf("%s venceu!", player2);
-        return;
-    }
-    printf("Deu velha!");
-}
-
-void playerXbot(void){
-    int turn = rand() % 2, stop = turn + 9;
-
-    while(!winner() && turn < stop){
-        printArray();
-
-        if(turn % 2 == 0)
-            playerMove(player1, symbol1);
-        else
-            botMove(symbol2);
-
-        turn++;
-    }
-
-    printArray();
-
-    /**
-    * correcao para identificar o ganhador
-    */
-    turn -= 1;
-
-    if(winner() && turn % 2 == 0){
-        printf("%s venceu!", player1);
-        return;
-    }
-    if(winner() && turn % 2 != 0){
-        printf("Maquina venceu!");
-        return;
-    }
-    printf("Deu velha!");
 }
 
 void menuOption(void){
@@ -334,16 +142,229 @@ void menuOption(void){
     }
 }
 
-int main(void){
+void printArray(void){
+    int ASCII = 65;
+
+    printf("  1 2 3\n");
+
+    for(int i=0; i<3; i++){
+        printf("%c ", ASCII++);
+
+        for(int j=0; j<3; j++){
+            printf("%c", arr[i][j]);
+
+            if(j!=2)
+                printf("|");
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+int validSymbol(char symbol){
+    symbol = toupper(symbol);
+
+    if(symbol == 'X' || symbol == 'O')
+        return 1;
+
+    return 0;
+}
+
+void playerXplayer(void){
+    int turn = 0;
+
+    while(!winner() && turn < 9){
+        printArray();
+
+        if(turn % 2 == 0)
+            playerMove(player1, symbol1);
+        else
+            playerMove(player2, symbol2);
+
+        turn++;
+    }
+
+    printArray();
+
     /**
-    * modifica a seed para gerar numeros aleatorios toda vez que o
-    * programa for executado
+    * correcao para identificar o ganhador
     */
-    srand(time(NULL));
+    turn -= 1;
 
-    arrayInit();
+    if(winner() && turn % 2 == 0){
+        printf("%s venceu!", player1);
+        return;
+    }
+    if(winner() && turn % 2 != 0){
+        printf("%s venceu!", player2);
+        return;
+    }
+    printf("Deu velha!");
+}
 
-    menuOption();
+void playerXbot(void){
+    int turn = rand() % 2, stop = turn + 9;
+
+    while(!winner() && turn < stop){
+        printArray();
+
+        if(turn % 2 == 0)
+            playerMove(player1, symbol1);
+        else
+            botMove(symbol2);
+
+        turn++;
+    }
+
+    printArray();
+
+    /**
+    * correcao para identificar o ganhador
+    */
+    turn -= 1;
+
+    if(winner() && turn % 2 == 0){
+        printf("%s venceu!", player1);
+        return;
+    }
+    if(winner() && turn % 2 != 0){
+        printf("Maquina venceu!");
+        return;
+    }
+    printf("Deu velha!");
+}
+
+void botMove(char symbol){
+    int line = rand() % 3, column = rand() % 3;
+
+    while(!validCoord(line, column) || !coordEmpty(line, column)){
+        line = rand() % 3;
+        column = rand() % 3;
+    }
+
+    arr[line][column] = toupper(symbol);
+
+    /**
+    * OS variation
+    * system("cls"); -> Windows
+    * system("clear"); -> Linux
+    */
+    system("cls");
+}
+
+void playerMove(char player[51], char symbol){
+    int j, line, column;
+    char i;
+
+    printf("Vez de %s. Indique linha e coluna para jogar\n", player);
+
+    printf("linha:\n");
+    scanf(" %c", &i);
+    line = toupper(i) - 65;
+
+    printf("coluna:\n");
+    scanf("%i", &j);
+    column = j - 1;
+
+    while(!validCoord(line, column) || !coordEmpty(line, column)){
+        printf("Coordenada invalida. Digite novamente!\n");
+
+        printf("linha:\n");
+        scanf(" %c", &i);
+        line = toupper(i) - 65;
+
+        printf("coluna:\n");
+        scanf("%i", &j);
+        column = j - 1;
+    }
+
+    arr[line][column] = toupper(symbol);
+
+    /**
+    * OS variation
+    * system("cls"); -> Windows
+    * system("clear"); -> Linux
+    */
+    system("cls");
+}
+
+int validCoord(int line, int column){
+    if(line>=0 && line<3 && column>=0 && column<3)
+        return 1;
+
+    return 0;
+}
+
+int coordEmpty(int line, int column){
+    if(!validSymbol(arr[line][column]))
+        return 1;
+
+    return 0;
+}
+
+int winner(void){
+    if(lineWin() || columnWin() || diagonalWin())
+        return 1;
+
+    return 0;
+}
+
+int lineWin(void){
+    int count = 0;
+
+    for(int i=0; i<3; i++){
+        for(int j=0; j<2; j++){
+            if(validSymbol(arr[i][j]) && arr[i][j] == arr[i][j+1])
+                count++;
+        }
+        if(count == 2)
+            return 1;
+
+        count = 0;
+    }
+    return 0;
+}
+
+int columnWin(void){
+    int count = 0;
+
+    for(int j=0; j<3; j++){
+        for(int i=0; i<2; i++){
+            if(validSymbol(arr[i][j]) && arr[i][j] == arr[i+1][j])
+                count++;
+        }
+        if(count == 2)
+            return 1;
+
+        count = 0;
+    }
+    return 0;
+}
+
+int diagonalWin(void){
+    int count = 0;
+
+    /**
+    * main diagonal
+    */
+    for(int i=0; i<2; i++){
+        if(validSymbol(arr[i][i]) && arr[i][i] == arr[i+1][i+1])
+            count++;
+    }
+    if(count == 2)
+        return 1;
+
+    count = 0;
+
+    /**
+    * secondary diagonal
+    */
+    for(int i=0; i<2; i++){
+        if(validSymbol(arr[i][i]) && arr[i][2-i] == arr[i+1][1-i])
+            count++;
+    }
+    if(count == 2)
+        return 1;
 
     return 0;
 }
