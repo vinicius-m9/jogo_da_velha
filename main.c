@@ -32,7 +32,15 @@ void printArray(void);
 int validSymbol(char symbol);
 void playerXplayer(void);
 void playerXbot(void);
-void botMove(char symbol);
+void botMove();
+int botWin(void);
+int botBlock(void);
+int botLineWin(void);
+int botColumnWin(void);
+int botDiagonalWin(void);
+int botLineBlock(void);
+int botColumnBlock(void);
+int botDiagonalBlock(void);
 void playerMove(char player[51], char symbol);
 int validCoord(int line, int column);
 int coordEmpty(int line, int column);
@@ -171,9 +179,9 @@ int validSymbol(char symbol){
 }
 
 void playerXplayer(void){
-    int turn = 0;
+    int turn = rand() % 2, stop = turn + 9;
 
-    while(!winner() && turn < 9){
+    while(!winner() && turn < stop){
         printArray();
 
         if(turn % 2 == 0)
@@ -211,7 +219,7 @@ void playerXbot(void){
         if(turn % 2 == 0)
             playerMove(player1, symbol1);
         else
-            botMove(symbol2);
+            botMove();
 
         turn++;
     }
@@ -234,15 +242,21 @@ void playerXbot(void){
     printf("Deu velha!");
 }
 
-void botMove(char symbol){
+void botMove(){
     int line = rand() % 3, column = rand() % 3;
+
+    if(botWin())
+        return;
+
+    if(botBlock())
+        return;
 
     while(!validCoord(line, column) || !coordEmpty(line, column)){
         line = rand() % 3;
         column = rand() % 3;
     }
 
-    arr[line][column] = toupper(symbol);
+    arr[line][column] = toupper(symbol2);
 
     /**
     * OS variation
@@ -250,6 +264,262 @@ void botMove(char symbol){
     * system("clear"); -> Linux
     */
     system("cls");
+}
+
+int botWin(void){
+    if(botLineWin() || botColumnWin() || botDiagonalWin())
+        return 1;
+
+    return 0;
+}
+
+int botBlock(void){
+    if(botLineBlock() || botColumnBlock() || botDiagonalBlock())
+        return 1;
+
+    return 0;
+}
+
+int botLineWin(void){
+    int win = 0, line, column;
+
+    for(int i = 0; i < 3; i++){
+        for(int j = 0; j < 3; j++){
+            if(arr[i][j] == toupper(symbol2))
+                win++;
+            else{
+                line = i;
+                column = j;
+            }
+        }
+
+        if(win == 2 && coordEmpty(line, column)){
+            arr[line][column] = toupper(symbol2);
+
+            /**
+            * OS variation
+            * system("cls"); -> Windows
+            * system("clear"); -> Linux
+            */
+            system("cls");
+
+            return 1;
+        }
+
+        win = 0;
+    }
+
+    return 0;
+}
+
+int botColumnWin(void){
+    int win = 0, line, column;
+
+    for(int j = 0; j < 3; j++){
+        for(int i = 0; i < 3; i++){
+            if(arr[i][j] == toupper(symbol2))
+                win++;
+            else{
+                line = i;
+                column = j;
+            }
+        }
+
+        if(win == 2 && coordEmpty(line, column)){
+            arr[line][column] = toupper(symbol2);
+
+            /**
+            * OS variation
+            * system("cls"); -> Windows
+            * system("clear"); -> Linux
+            */
+            system("cls");
+
+            return 1;
+        }
+
+        win = 0;
+    }
+
+    return 0;
+}
+
+int botDiagonalWin(void){
+    int win = 0, line, column;
+
+    /**
+    * main diagonal
+    */
+    for(int i = 0; i < 3; i++){
+        if(arr[i][i] == toupper(symbol2))
+            win++;
+        else{
+            line = i;
+            column = i;
+        }
+    }
+
+    if(win == 2 && coordEmpty(line, column)){
+        arr[line][column] = toupper(symbol2);
+
+        /**
+        * OS variation
+        * system("cls"); -> Windows
+        * system("clear"); -> Linux
+        */
+        system("cls");
+
+        return 1;
+    }
+
+    win = 0;
+
+    /**
+    * secondary diagonal
+    */
+    for(int i = 0; i < 3; i++){
+        if(arr[i][2 - i] == toupper(symbol2))
+            win++;
+        else{
+            line = i;
+            column = 2 - i;
+        }
+    }
+
+    if(win == 2 && coordEmpty(line, column)){
+        arr[line][column] = toupper(symbol2);
+
+        /**
+        * OS variation
+        * system("cls"); -> Windows
+        * system("clear"); -> Linux
+        */
+        system("cls");
+
+        return 1;
+    }
+
+    win = 0;
+
+    return 0;
+}
+
+int botLineBlock(void){
+    int block = 0, line, column;
+
+    for(int i = 0; i < 3; i++){
+        for(int j = 0; j < 3; j++){
+            if(arr[i][j] == toupper(symbol1))
+                block++;
+            else{
+                line = i;
+                column = j;
+            }
+        }
+
+        if(block == 2 && coordEmpty(line, column)){
+            arr[line][column] = toupper(symbol2);
+
+            /**
+            * OS variation
+            * system("cls"); -> Windows
+            * system("clear"); -> Linux
+            */
+            system("cls");
+
+            return 1;
+        }
+
+        block = 0;
+    }
+
+    return 0;
+}
+
+int botColumnBlock(void){
+    int block = 0, line, column;
+
+    for(int j = 0; j < 3; j++){
+        for(int i = 0; i < 3; i++){
+            if(arr[i][j] == toupper(symbol1))
+                block++;
+            else{
+                line = i;
+                column = j;
+            }
+        }
+
+        if(block == 2 && coordEmpty(line, column)){
+            arr[line][column] = toupper(symbol2);
+
+            /**
+            * OS variation
+            * system("cls"); -> Windows
+            * system("clear"); -> Linux
+            */
+            system("cls");
+
+            return 1;
+        }
+
+        block = 0;
+    }
+
+    return 0;
+}
+
+int botDiagonalBlock(void){
+    int block = 0, line, column;
+
+    for(int i = 0; i < 3; i++){
+        if(arr[i][2-i] == toupper(symbol1))
+            block++;
+        else{
+            line = i;
+            column = 2 - i;
+        }
+    }
+
+    if(block == 2 && coordEmpty(line, column)){
+        arr[line][column] = toupper(symbol2);
+
+        /**
+        * OS variation
+        * system("cls"); -> Windows
+        * system("clear"); -> Linux
+        */
+        system("cls");
+
+        return 1;
+    }
+
+    block = 0;
+
+    for(int i = 0; i < 3; i++){
+        if(arr[i][i] == toupper(symbol1))
+            block++;
+        else{
+            line = i;
+            column = i;
+        }
+    }
+
+    if(block == 2 && coordEmpty(line, column)){
+        arr[line][column] = toupper(symbol2);
+
+        /**
+        * OS variation
+        * system("cls"); -> Windows
+        * system("clear"); -> Linux
+        */
+        system("cls");
+
+        return 1;
+    }
+
+    block = 0;
+
+    return 0;
 }
 
 void playerMove(char player[51], char symbol){
@@ -312,11 +582,11 @@ int winner(void){
 int lineWin(void){
     int count = 0;
 
-    for(int i=0; i<3; i++){
-        for(int j=0; j<2; j++){
+    for(int i = 0; i < 3; i++){
+        for(int j = 0; j < 2; j++)
             if(validSymbol(arr[i][j]) && arr[i][j] == arr[i][j+1])
                 count++;
-        }
+
         if(count == 2)
             return 1;
 
@@ -328,11 +598,11 @@ int lineWin(void){
 int columnWin(void){
     int count = 0;
 
-    for(int j=0; j<3; j++){
-        for(int i=0; i<2; i++){
+    for(int j = 0; j < 3; j++){
+        for(int i = 0; i < 2; i++)
             if(validSymbol(arr[i][j]) && arr[i][j] == arr[i+1][j])
                 count++;
-        }
+
         if(count == 2)
             return 1;
 
@@ -347,10 +617,10 @@ int diagonalWin(void){
     /**
     * main diagonal
     */
-    for(int i=0; i<2; i++){
+    for(int i = 0; i < 2; i++)
         if(validSymbol(arr[i][i]) && arr[i][i] == arr[i+1][i+1])
             count++;
-    }
+
     if(count == 2)
         return 1;
 
@@ -359,10 +629,10 @@ int diagonalWin(void){
     /**
     * secondary diagonal
     */
-    for(int i=0; i<2; i++){
-        if(validSymbol(arr[i][i]) && arr[i][2-i] == arr[i+1][1-i])
+    for(int i = 0; i < 2; i++)
+        if(validSymbol(arr[i][2-i]) && arr[i][2-i] == arr[i+1][1-i])
             count++;
-    }
+
     if(count == 2)
         return 1;
 
