@@ -32,7 +32,7 @@ void printArray(void);
 int validSymbol(char symbol);
 void playerXplayer(void);
 void playerXbot(void);
-void botMove(void);
+void botMove(int turn);
 int botWin(void);
 int botBlock(void);
 int botLineWin(void);
@@ -44,6 +44,7 @@ int botDiagonalBlock(void);
 void playerMove(char player[51], char symbol);
 int validCoord(int line, int column);
 int coordEmpty(int line, int column);
+int permute(int i, int j);
 int winner(void);
 int lineWin(void);
 int columnWin(void);
@@ -179,7 +180,14 @@ int validSymbol(char symbol){
 }
 
 void playerXplayer(void){
-    int turn = rand() % 2, stop = turn + 9;
+    int turn, stop;
+
+    if(toupper(symbol1) == 'X')
+        turn = 0;
+    else
+        turn = 1;
+
+    stop = turn + 9;
 
     while(!winner() && turn < stop){
         printArray();
@@ -211,7 +219,14 @@ void playerXplayer(void){
 }
 
 void playerXbot(void){
-    int turn = rand() % 2, stop = turn + 9;
+    int turn, stop;
+
+    if(toupper(symbol1) == 'X')
+        turn = 0;
+    else
+        turn = 1;
+
+    stop = turn + 9;
 
     while(!winner() && turn < stop){
         printArray();
@@ -219,7 +234,7 @@ void playerXbot(void){
         if(turn % 2 == 0)
             playerMove(player1, symbol1);
         else
-            botMove();
+            botMove(turn);
 
         turn++;
     }
@@ -242,8 +257,37 @@ void playerXbot(void){
     printf("Deu velha!");
 }
 
-void botMove(void){
+void botMove(int turn){
     int line = rand() % 3, column = rand() % 3;
+
+    if(turn == 1){
+        if(arr[1][1] == toupper(symbol1)){
+            int i = permute(0, 2), j = permute(0, 2);
+
+            arr[i][j] = toupper(symbol2);
+
+            /**
+            * OS variation
+            * system("cls"); -> Windows
+            * system("clear"); -> Linux
+            */
+            system("cls");
+
+            return;
+        }
+        else{
+            arr[1][1] = toupper(symbol2);
+
+            /**
+            * OS variation
+            * system("cls"); -> Windows
+            * system("clear"); -> Linux
+            */
+            system("cls");
+
+            return;
+        }
+    }
 
     if(botWin())
         return;
@@ -472,7 +516,7 @@ int botDiagonalBlock(void){
     int block = 0, line, column;
 
     for(int i = 0; i < 3; i++){
-        if(arr[i][2-i] == toupper(symbol1))
+        if(arr[i][2 - i] == toupper(symbol1))
             block++;
         else{
             line = i;
@@ -528,22 +572,18 @@ void playerMove(char player[51], char symbol){
 
     printf("Vez de %s. Indique linha e coluna para jogar\n", player);
 
-    printf("linha:\n");
     scanf(" %c", &i);
     line = toupper(i) - 65;
 
-    printf("coluna:\n");
     scanf("%i", &j);
     column = j - 1;
 
     while(!validCoord(line, column) || !coordEmpty(line, column)){
         printf("Coordenada invalida. Digite novamente!\n");
 
-        printf("linha:\n");
         scanf(" %c", &i);
         line = toupper(i) - 65;
 
-        printf("coluna:\n");
         scanf("%i", &j);
         column = j - 1;
     }
@@ -559,7 +599,7 @@ void playerMove(char player[51], char symbol){
 }
 
 int validCoord(int line, int column){
-    if(line>=0 && line<3 && column>=0 && column<3)
+    if(line >= 0 && line < 3 && column >= 0 && column < 3)
         return 1;
 
     return 0;
@@ -570,6 +610,13 @@ int coordEmpty(int line, int column){
         return 1;
 
     return 0;
+}
+
+int permute(int i, int j){
+    int aux = rand() % 2;
+    int arrAux[2] = {i, j};
+
+    return arrAux[aux];
 }
 
 int winner(void){
