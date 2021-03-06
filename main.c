@@ -32,7 +32,7 @@ void printArray(void);
 int validSymbol(char symbol);
 void playerXplayer(void);
 void playerXbot(void);
-void botMove();
+void botMove(void);
 int botWin(void);
 int botBlock(void);
 int botLineWin(void);
@@ -242,7 +242,7 @@ void playerXbot(void){
     printf("Deu velha!");
 }
 
-void botMove(){
+void botMove(void){
     int line = rand() % 3, column = rand() % 3;
 
     if(botWin())
