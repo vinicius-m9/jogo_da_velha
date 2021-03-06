@@ -44,7 +44,6 @@ int botDiagonalBlock(void);
 void playerMove(char player[51], char symbol);
 int validCoord(int line, int column);
 int coordEmpty(int line, int column);
-int permute(int i, int j);
 int winner(void);
 int lineWin(void);
 int columnWin(void);
@@ -262,7 +261,8 @@ void botMove(int turn){
 
     if(turn == 1){
         if(arr[1][1] == toupper(symbol1)){
-            int i = permute(0, 2), j = permute(0, 2);
+            int arrAux[2] = {0, 2};
+            int i = arrAux[rand() % 2], j = arrAux[rand() % 2];
 
             arr[i][j] = toupper(symbol2);
 
@@ -610,13 +610,6 @@ int coordEmpty(int line, int column){
         return 1;
 
     return 0;
-}
-
-int permute(int i, int j){
-    int aux = rand() % 2;
-    int arrAux[2] = {i, j};
-
-    return arrAux[aux];
 }
 
 int winner(void){
